@@ -1,0 +1,41 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Transactions;
+using AutoMapper;
+using TinyCsvParser.Mapping;
+using Transactions.Database.Entities;
+using Transactions.Mappings.Entities;
+using Transactions.Models.Transaction;
+
+namespace Transactions.Mappings{
+    public class AutoMapperProfile : Profile{
+        public AutoMapperProfile(){
+            /*CreateMap<CsvMappingResult<TransactionCsvEntity>, TransactionCsvEntity>()
+                .ForMember(d=>d.Id, mo=>mo.MapFrom(s=>s.Result.Id))
+                .ForMember(d=>d.BeneficiaryName, mo=>mo.MapFrom(s=>s.Result.BeneficiaryName))
+                .ForMember(d=>d.Date, mo=>mo.MapFrom(s=>s.Result.Date))
+                .ForMember(d=>d.Direction, mo=>mo.MapFrom(s=>s.Result.Direction))
+                .ForMember(d=>d.Amount, mo=>mo.MapFrom(s=>s.Result.Amount))
+                .ForMember(d=>d.Description, mo=>mo.MapFrom(s=>s.Result.Description))
+                .ForMember(d=>d.Currency, mo=>mo.MapFrom(s=>s.Result.Currency))
+                .ForMember(d=>d.Mcc, mo=>mo.MapFrom(s=>s.Result.Mcc))
+                .ForMember(d=>d.Kind, mo=>mo.MapFrom(s=>s.Result.Kind));
+
+            CreateMap<TransactionCsvEntity, Models.Transaction.Transaction>().ForMember(d=>d.Amount, mo=>mo.MapFrom(s=>double.Parse(Regex.Match(s.Amount,@"\d+.\d+").Value)));*/
+
+            CreateMap<CsvMappingResult<TransactionCsvEntity>, Models.Transaction.Transaction>()
+                .ForMember(d=>d.Id, mo=>mo.MapFrom(s=>s.Result.Id))
+                .ForMember(d=>d.BeneficiaryName, mo=>mo.MapFrom(s=>s.Result.BeneficiaryName))
+                .ForMember(d=>d.Date, mo=>mo.MapFrom(s=>s.Result.Date))
+                .ForMember(d=>d.Direction, mo=>mo.MapFrom(s=>s.Result.Direction))
+                .ForMember(d=>d.Amount, mo=>mo.MapFrom(s=>double.Parse(Regex.Match(s.Result.Amount,@"\d+.\d+").Value)))
+                .ForMember(d=>d.Description, mo=>mo.MapFrom(s=>s.Result.Description))
+                .ForMember(d=>d.Currency, mo=>mo.MapFrom(s=>s.Result.Currency))
+                .ForMember(d=>d.Mcc, mo=>mo.MapFrom(s=>s.Result.Mcc))
+                .ForMember(d=>d.Kind, mo=>mo.MapFrom(s=>s.Result.Kind));
+
+            CreateMap<Models.Transaction.Transaction, TransactionEntity>();
+            //CreateMap<List<Models.Transaction.Transaction>, List<TransactionEntity>>();
+        }
+    }
+}
