@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Transactions.Models.Transaction.Enums;
@@ -11,7 +12,8 @@ namespace Transactions.Models.Transaction{
         public string BeneficiaryName { get; set; }
 
         [Required]
-        public string Date { get; set; }
+        [DisplayFormat(DataFormatString ="{0:MM/dd/yyyy}")]
+        public DateTime Date { get; set; }
 
         [Required]
         public DirectionsEnum Direction { get; set; }

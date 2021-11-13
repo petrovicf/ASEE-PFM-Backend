@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Transactions;
@@ -26,7 +27,7 @@ namespace Transactions.Mappings{
             CreateMap<CsvMappingResult<TransactionCsvEntity>, Models.Transaction.Transaction>()
                 .ForMember(d=>d.Id, mo=>mo.MapFrom(s=>s.Result.Id))
                 .ForMember(d=>d.BeneficiaryName, mo=>mo.MapFrom(s=>s.Result.BeneficiaryName))
-                .ForMember(d=>d.Date, mo=>mo.MapFrom(s=>s.Result.Date))
+                .ForMember(d=>d.Date, mo=>mo.MapFrom(s=>DateTime.Parse(s.Result.Date)))
                 .ForMember(d=>d.Direction, mo=>mo.MapFrom(s=>s.Result.Direction))
                 .ForMember(d=>d.Amount, mo=>mo.MapFrom(s=>double.Parse(Regex.Match(s.Result.Amount,@"\d+.\d+").Value)))
                 .ForMember(d=>d.Description, mo=>mo.MapFrom(s=>s.Result.Description))
@@ -36,6 +37,8 @@ namespace Transactions.Mappings{
 
             CreateMap<Models.Transaction.Transaction, TransactionEntity>();
             //CreateMap<List<Models.Transaction.Transaction>, List<TransactionEntity>>();
+            CreateMap<TransactionEntity, Models.Transaction.Transaction>();
+            CreateMap<TransactionPagedList<TransactionEntity>, TransactionPagedList<Models.Transaction.Transaction>>();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Transactions.Models.Transaction.Enums;
 
 namespace Transactions.Database.Entities{
@@ -6,7 +7,7 @@ namespace Transactions.Database.Entities{
 
         public string BeneficiaryName { get; set; }
 
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
 
         public DirectionsEnum Direction { get; set; }
 

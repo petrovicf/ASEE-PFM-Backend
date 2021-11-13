@@ -11,7 +11,7 @@ namespace Transactions.Database.Configurations{
             builder.HasKey(t=>t.Id);
             builder.Property(t=>t.Id).HasMaxLength(32).Metadata.SetAfterSaveBehavior(Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Throw);
             builder.Property(t=>t.BeneficiaryName).HasMaxLength(256);
-            builder.Property(t=>t.Date).IsRequired().HasMaxLength(16);
+            builder.Property(t=>t.Date).IsRequired();
             builder.Property(t=>t.Direction).HasConversion<string>().IsRequired();
             builder.Property(t=>t.Amount).IsRequired();
             builder.Property(t=>t.Description).HasMaxLength(1024);

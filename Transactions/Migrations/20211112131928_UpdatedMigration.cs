@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Transactions.Migrations
 {
-    public partial class ThirdMigration : Migration
+    public partial class UpdatedMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +13,7 @@ namespace Transactions.Migrations
                 {
                     Id = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     BeneficiaryName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Date = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Direction = table.Column<string>(type: "text", nullable: false),
                     Amount = table.Column<double>(type: "double precision", nullable: false),
                     Description = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
