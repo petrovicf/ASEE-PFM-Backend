@@ -11,12 +11,12 @@ namespace Transactions.Mappings{
             MapProperty(0, x=>x.Id);
             MapProperty(1, x=>x.BeneficiaryName);
             MapProperty(2, x=>x.Date);
-            MapProperty(3, x=>x.Direction, new EnumConverter<DirectionsEnum>(true));
+            MapProperty(3, x=>x.Direction);
             MapProperty(4, x=>x.Amount);
             MapProperty(5, x=>x.Description);
             MapProperty(6, x=>x.Currency);
             MapProperty(7, x=>x.Mcc);
-            MapProperty(8, x=>x.Kind, new EnumConverter<TransactionKindsEnum>(true));
+            MapProperty(8, x=>x.Kind);
         }
     }
 }

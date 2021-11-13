@@ -7,6 +7,7 @@ using TinyCsvParser.Mapping;
 using Transactions.Database.Entities;
 using Transactions.Mappings.Entities;
 using Transactions.Models.Transaction;
+using Transactions.Models.Transaction.Enums;
 
 namespace Transactions.Mappings{
     public class AutoMapperProfile : Profile{
@@ -28,12 +29,12 @@ namespace Transactions.Mappings{
                 .ForMember(d=>d.Id, mo=>mo.MapFrom(s=>s.Result.Id))
                 .ForMember(d=>d.BeneficiaryName, mo=>mo.MapFrom(s=>s.Result.BeneficiaryName))
                 .ForMember(d=>d.Date, mo=>mo.MapFrom(s=>DateTime.Parse(s.Result.Date)))
-                .ForMember(d=>d.Direction, mo=>mo.MapFrom(s=>s.Result.Direction))
+                .ForMember(d=>d.Direction, mo=>mo.MapFrom(s=>Enum.Parse(typeof(DirectionsEnum), s.Result.Direction,true)))
                 .ForMember(d=>d.Amount, mo=>mo.MapFrom(s=>double.Parse(Regex.Match(s.Result.Amount,@"\d+.\d+").Value)))
                 .ForMember(d=>d.Description, mo=>mo.MapFrom(s=>s.Result.Description))
                 .ForMember(d=>d.Currency, mo=>mo.MapFrom(s=>s.Result.Currency))
                 .ForMember(d=>d.Mcc, mo=>mo.MapFrom(s=>s.Result.Mcc))
-                .ForMember(d=>d.Kind, mo=>mo.MapFrom(s=>s.Result.Kind));
+                .ForMember(d=>d.Kind, mo=>mo.MapFrom(s=>Enum.Parse(typeof(TransactionKindsEnum),s.Result.Kind,true)));
 
             CreateMap<Models.Transaction.Transaction, TransactionEntity>();
             //CreateMap<List<Models.Transaction.Transaction>, List<TransactionEntity>>();

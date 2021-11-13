@@ -8,7 +8,7 @@ namespace Transactions.Mappings.Entities{
 
         public string Date { get; set; }
 
-        public DirectionsEnum Direction { get; set; }
+        public string Direction { get; set; }
 
         public string Amount { get; set; }
         
@@ -18,6 +18,6 @@ namespace Transactions.Mappings.Entities{
 
         public string Mcc { get; set; }
 
-        public TransactionKindsEnum Kind { get; set; }
+        public string Kind { get; set; }
     }
 }
