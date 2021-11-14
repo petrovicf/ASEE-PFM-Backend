@@ -19,6 +19,7 @@ using Transactions.Mappings.Entities;
 using Transactions.Models.Transaction.Enums;
 using Transactions.Problems;
 using Transactions.Services;
+using Transactions.Validation;
 
 namespace Transactions.Controllers{
     [ApiController]
@@ -56,7 +57,9 @@ namespace Transactions.Controllers{
 
             var transactionList = csvParser.ReadFromFile(filePath, Encoding.ASCII).ToList();
 
-            var validationProblem = Validate(transactionList);
+            transactionList.RemoveAt(transactionList.Count-1);
+
+            var validationProblem = Validate.ValidateList<CsvMappingResult<TransactionCsvEntity>>(transactionList);
 
             if(validationProblem.Errors.Count>0){
                 return BadRequest(validationProblem);
@@ -64,49 +67,11 @@ namespace Transactions.Controllers{
 
             var transactions = _mapper.Map<List<CsvMappingResult<TransactionCsvEntity>>, List<Models.Transaction.Transaction>>(transactionList);
 
-            transactions.RemoveAt(transactions.Count-1);
-            //await _transactionsService.InsertTransactions(transactions);
+            await _transactionsService.InsertTransactions(transactions);
 
             System.IO.File.Delete(filePath);
 
             return Ok("Transaction splitted");
-        }
-
-        private ValidationProblem Validate(List<CsvMappingResult<TransactionCsvEntity>> list){
-            List<Errors> errors = new List<Errors>();
-
-            foreach(var item in list){
-                if(string.IsNullOrEmpty(item.Result.Id)){
-                    errors.Add(CreateError("id", ErrEnum.Required, GetEnumDescription(ErrEnum.Required)));
-                    continue;
-                }
-            }
-
-            return new ValidationProblem{
-                Errors = errors
-            };
-        }
-
-        private Errors CreateError(string tag, ErrEnum err, string message){
-            return new Errors{
-                Tag = tag,
-                Error = err,
-                Message = message
-            };
-        }
-
-        private string GetEnumDescription(Enum value)
-        {
-            FieldInfo fi = value.GetType().GetField(value.ToString());
-
-            DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
-
-            if (attributes != null && attributes.Any())
-            {
-                return attributes.First().Description;
-            }
-
-            return value.ToString();
         }
 
         [HttpGet]
