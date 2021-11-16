@@ -33,7 +33,7 @@ namespace Transactions.Models.Transaction{
         [Required]
         public TransactionKindsEnum Kind { get; set; }
 
-        /*[ReadOnly(true)]
-        public string CatCode { get; set; }*/
+        [ReadOnly(true)]
+        public string CatCode { get; set; }
     }
 }

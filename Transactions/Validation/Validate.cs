@@ -23,7 +23,10 @@ namespace Transactions.Validation{
             List<Errors> errors = new List<Errors>();
 
             if(typeof(T) == typeof(CsvMappingResult<TransactionCsvEntity>)){
-                errors = ValidateCsvMappingResultList(list as List<CsvMappingResult<TransactionCsvEntity>>);
+                errors = ValidateCsvMappingResultListTransactions(list as List<CsvMappingResult<TransactionCsvEntity>>);
+            }
+            else if(typeof(T) == typeof(CsvMappingResult<CategoryCsv>)){
+                errors = ValidateCsvMappingResultListCategories(list as List<CsvMappingResult<CategoryCsv>>);
             }
 
             return new ValidationProblem{
@@ -31,7 +34,7 @@ namespace Transactions.Validation{
             };
         }
 
-        private static List<Errors> ValidateCsvMappingResultList(List<CsvMappingResult<TransactionCsvEntity>> list){
+        private static List<Errors> ValidateCsvMappingResultListTransactions(List<CsvMappingResult<TransactionCsvEntity>> list){
                 List<Errors> errors = new List<Errors>();
                 List<Validate> validations = new List<Validate>(){
                     {new Validate{PropertyName = "Result.Id", Required = true}},
@@ -92,6 +95,32 @@ namespace Transactions.Validation{
                         }
                     }
                 }
+                return errors;
+        }
+
+        private static List<Errors> ValidateCsvMappingResultListCategories(List<CsvMappingResult<CategoryCsv>> list){
+                List<Errors> errors = new List<Errors>();
+                
+                List<Validate> validations = new List<Validate>(){
+                    {new Validate{PropertyName = "Result.Code", Required = true}},
+                    {new Validate{PropertyName = "Result.Name", Required = true}}
+                };
+                string value;
+                ErrEnum err;
+
+                foreach(var item in list){
+                    foreach(var property in validations){
+                        value = GetPropertyValue(item, property.PropertyName).ToString();
+                        if(property.Required){
+                            if(string.IsNullOrEmpty(value.ToString())){
+                                err = ErrEnum.Required;
+                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 return errors;
         }
 

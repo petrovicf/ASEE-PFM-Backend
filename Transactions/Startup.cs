@@ -45,6 +45,9 @@ namespace Transactions
             services.AddScoped<ITransactionsRepository, TransactionsRepository>();
             services.AddScoped<ITransactionsService, TransactionsService>();
 
+            services.AddScoped<ICategoriesService, CategoriesService>();
+            services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
 

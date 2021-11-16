@@ -19,6 +19,26 @@ namespace Transactions.Migrations
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+            modelBuilder.Entity("Transactions.Database.Entities.CategoryEntity", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("ParentCode")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("categories");
+                });
+
             modelBuilder.Entity("Transactions.Database.Entities.TransactionEntity", b =>
                 {
                     b.Property<string>("Id")
@@ -31,6 +51,9 @@ namespace Transactions.Migrations
                     b.Property<string>("BeneficiaryName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Catcode")
+                        .HasColumnType("character varying(32)");
 
                     b.Property<string>("Currency")
                         .IsRequired()
@@ -58,7 +81,23 @@ namespace Transactions.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Catcode");
+
                     b.ToTable("transactions");
+                });
+
+            modelBuilder.Entity("Transactions.Database.Entities.TransactionEntity", b =>
+                {
+                    b.HasOne("Transactions.Database.Entities.CategoryEntity", "Category")
+                        .WithMany("Transaction")
+                        .HasForeignKey("Catcode");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Transactions.Database.Entities.CategoryEntity", b =>
+                {
+                    b.Navigation("Transaction");
                 });
 #pragma warning restore 612, 618
         }

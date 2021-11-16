@@ -6,6 +6,7 @@ namespace Transactions.Database{
     public class TransactionsDbContext:DbContext{
 
         public DbSet<TransactionEntity> Transactions { get; set; }
+        public DbSet<CategoryEntity> Categories { get; set; }
 
         public TransactionsDbContext(){
 
@@ -16,6 +17,8 @@ namespace Transactions.Database{
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TransactionEntity>().HasOne<CategoryEntity>(t=>t.Category).WithMany(c=>c.Transaction).HasForeignKey(c=>c.Catcode);
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }

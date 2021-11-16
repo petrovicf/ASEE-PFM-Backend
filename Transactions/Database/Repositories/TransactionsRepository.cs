@@ -24,7 +24,7 @@ namespace Transactions.Database.Repositories{
             var query = _dbContext.Transactions.AsQueryable();
 
             if(transactionKinds!=null && transactionKinds.Count>0){
-                query = query.Where(t=>transactionKinds.Contains(t.Kind) && t.Date.Date >= startDate.Value.Date);
+                query = query.Where(t=>transactionKinds.Contains(t.Kind) && t.Date.Date >= startDate.Value.Date && t.Date.Date <= endDate.Value.Date);
             }
 
             var totalCount = await query.CountAsync();

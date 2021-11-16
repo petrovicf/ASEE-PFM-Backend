@@ -6,6 +6,7 @@ using AutoMapper;
 using TinyCsvParser.Mapping;
 using Transactions.Database.Entities;
 using Transactions.Mappings.Entities;
+using Transactions.Models.Category;
 using Transactions.Models.Transaction;
 using Transactions.Models.Transaction.Enums;
 
@@ -40,6 +41,12 @@ namespace Transactions.Mappings{
             //CreateMap<List<Models.Transaction.Transaction>, List<TransactionEntity>>();
             CreateMap<TransactionEntity, Models.Transaction.Transaction>();
             CreateMap<TransactionPagedList<TransactionEntity>, TransactionPagedList<Models.Transaction.Transaction>>();
+
+            CreateMap<CsvMappingResult<CategoryCsv>, Category>()
+                .ForMember(c=>c.Code, mo=>mo.MapFrom(cs=>cs.Result.Code))
+                .ForMember(c=>c.ParentCode, mo=>mo.MapFrom(cs=>cs.Result.ParentCode))
+                .ForMember(c=>c.Name, mo=>mo.MapFrom(cs=>cs.Result.Name));
+            CreateMap<Category, CategoryEntity>();
         }
     }
 }

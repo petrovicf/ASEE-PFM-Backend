@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using TinyCsvParser;
 using TinyCsvParser.Mapping;
 using Transactions.Database.Entities;
+using Transactions.Files;
 using Transactions.Mappings;
 using Transactions.Mappings.Entities;
 using Transactions.Models.Transaction.Enums;
@@ -23,7 +24,7 @@ using Transactions.Validation;
 
 namespace Transactions.Controllers{
     [ApiController]
-    [Route("v1/transactions")]
+    [Route("transactions")]
     public class TransactionsController:ControllerBase{
         private readonly ILogger<TransactionsController> _logger;
         private readonly IMapper _mapper;
@@ -35,25 +36,13 @@ namespace Transactions.Controllers{
             _transactionsService=transactionsService;
         }
 
-        private async Task<string> GetFilePath(IFormFile file){
-            var filePath = Path.GetTempFileName();
-
-            var stream = System.IO.File.Create(filePath);
-
-            await file.CopyToAsync(stream);
-
-            stream.Close();
-
-            return filePath;
-        }
-
         [HttpPost("import")]
         public async Task<IActionResult> ImportTransactions([FromForm] IFormFile csvFile){
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvTransactionMapping csvTransactionMapping = new CsvTransactionMapping();
             CsvParser<TransactionCsvEntity> csvParser = new CsvParser<TransactionCsvEntity>(csvParserOptions,csvTransactionMapping);
 
-            string filePath = await GetFilePath(csvFile);
+            string filePath = await FileMethods.GetFilePath(csvFile);
 
             var transactionList = csvParser.ReadFromFile(filePath, Encoding.ASCII).ToList();
 

@@ -1,4 +1,5 @@
 using System;
+using Transactions.Models.Category;
 using Transactions.Models.Transaction.Enums;
 
 namespace Transactions.Database.Entities{
@@ -21,6 +22,7 @@ namespace Transactions.Database.Entities{
 
         public TransactionKindsEnum Kind { get; set; }
 
-        //public string CatCode { get; set; }
+        public CategoryEntity Category { get; set; }
+        public string Catcode { get; set; }
     }
 }
