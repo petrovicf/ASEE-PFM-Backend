@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Transactions.Commands;
 using Transactions.Database.Entities;
 using Transactions.Models.Transaction;
 using Transactions.Models.Transaction.Enums;
+using Transactions.Problems;
 
 namespace Transactions.Database.Repositories{
     public class TransactionsRepository : ITransactionsRepository{
@@ -15,11 +17,37 @@ namespace Transactions.Database.Repositories{
             _dbContext=dbContext;
         }
 
+        public async Task<Problem> Categorize(string id, TransactionCategorizeCommand transactionCategorizeCommand)
+        {
+            if(!await _dbContext.Categories.AnyAsync(c=>c.Code==transactionCategorizeCommand.Catcode)){
+                return new BusinessProblem{
+                    ProblemLiteral = "provided-category-does-not-exist",
+                    ProblemMessage = "Provided category does not exist",
+                    ProblemDetails = $"Category with code {transactionCategorizeCommand.Catcode} does not exist in database"
+                };
+            }
+            if(!await _dbContext.Transactions.AnyAsync(t=>t.Id==id)){
+                return new BusinessProblem{
+                    ProblemLiteral = "provided-transaction-does-not-exist",
+                    ProblemMessage = "Provided transaction does not exist",
+                    ProblemDetails = $"Transaction with id {id} does not exist in database"
+                };
+            }
+
+            var categorizedTransaction = await _dbContext.Transactions.FirstAsync(t=>t.Id==id);
+            categorizedTransaction.Catcode = transactionCategorizeCommand.Catcode;
+
+            _dbContext.Update(categorizedTransaction);
+            await _dbContext.SaveChangesAsync();
+
+            return null;
+        }
+
         public async Task<TransactionPagedList<TransactionEntity>> Get(List<TransactionKindsEnum> transactionKinds = null, DateTime? startDate=null, DateTime? endDate = null, int page = 1,
         int pageSize = 10, string sortBy = null, SortOrder sortOrder = SortOrder.Asc)
         {
             startDate ??= new DateTime(2010, 1, 1);
-            endDate ??= DateTime.Today;
+            endDate ??= DateTime.Today.AddYears(5);
 
             var query = _dbContext.Transactions.AsQueryable();
 

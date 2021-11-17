@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,12 +14,13 @@ using Transactions.Files;
 using Transactions.Mappings;
 using Transactions.Mappings.Entities;
 using Transactions.Models.Category;
+using Transactions.Models.Transaction.Enums;
 using Transactions.Services;
 using Transactions.Validation;
 
 namespace Transactions.Controllers{
     [ApiController]
-    [Route("categories")]
+//    [Route("categories")]
     public class CategoriesController : ControllerBase{
         private readonly ILogger<CategoriesController> _logger;
         private readonly IMapper _mapper;
@@ -30,7 +32,7 @@ namespace Transactions.Controllers{
             _categoriesService = categoriesService;
         }
 
-        [HttpPost("import")]
+        [HttpPost("categories/import")]
         public async Task<IActionResult> ImportCategories([FromForm] IFormFile csvFile){
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvCategoryMapping csvCategoryMapping = new CsvCategoryMapping();
@@ -55,9 +57,11 @@ namespace Transactions.Controllers{
             return Ok("Categories imported");
         }
 
-        [HttpPost("{id}/categorize")]
-        public IActionResult CategorizeTransaction([FromRoute] string id, [FromBody] TransactionCategorizeCommand transactionCategorizeCommand){
-            return Ok();
+        [HttpGet("spending-analytics")]
+        public IActionResult ViewSpendingByCategory([FromQuery] string catcode, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] DirectionsEnum? direction){
+            var spendings = _categoriesService.GetSpendingsByCategory(catcode, startDate, endDate, direction);
+            
+            return Ok(spendings);
         }
     }
 }

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Transactions.Commands;
 using Transactions.Database.Entities;
 using Transactions.Database.Repositories;
 using Transactions.Models.Transaction;
 using Transactions.Models.Transaction.Enums;
+using Transactions.Problems;
 
 namespace Transactions.Services{
     public class TransactionsService : ITransactionsService{
@@ -16,6 +18,11 @@ namespace Transactions.Services{
         public TransactionsService(ITransactionsRepository transactionsRepository, IMapper mapper){
             _transactionsRepository=transactionsRepository;
             _mapper=mapper;
+        }
+
+        public async Task<Problem> CategorizeTransaction(string id, TransactionCategorizeCommand transactionCategorizeCommand)
+        {
+            return await _transactionsRepository.Categorize(id, transactionCategorizeCommand);;
         }
 
         public async Task<TransactionPagedList<Transaction>> GetTransactions(List<TransactionKindsEnum> transactionKinds = null, DateTime? startDate=null, DateTime? endDate = null, int page = 1,

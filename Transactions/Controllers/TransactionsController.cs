@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TinyCsvParser;
 using TinyCsvParser.Mapping;
+using Transactions.Commands;
 using Transactions.Database.Entities;
 using Transactions.Files;
 using Transactions.Mappings;
@@ -24,7 +25,7 @@ using Transactions.Validation;
 
 namespace Transactions.Controllers{
     [ApiController]
-    [Route("transactions")]
+    //[Route("transactions")]
     public class TransactionsController:ControllerBase{
         private readonly ILogger<TransactionsController> _logger;
         private readonly IMapper _mapper;
@@ -36,7 +37,7 @@ namespace Transactions.Controllers{
             _transactionsService=transactionsService;
         }
 
-        [HttpPost("import")]
+        [HttpPost("transactions/import")]
         public async Task<IActionResult> ImportTransactions([FromForm] IFormFile csvFile){
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvTransactionMapping csvTransactionMapping = new CsvTransactionMapping();
@@ -63,8 +64,8 @@ namespace Transactions.Controllers{
             return Ok("Transaction splitted");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetTransactions([FromQuery]List<TransactionKindsEnum> transactionKinds, [FromQuery]DateTime startDate, [FromQuery]DateTime endDate, [FromQuery]int? page,
+        [HttpGet("transactions")]
+        public async Task<IActionResult> GetTransactions([FromQuery]List<TransactionKindsEnum> transactionKinds, [FromQuery]DateTime? startDate, [FromQuery]DateTime? endDate, [FromQuery]int? page,
         [FromQuery]int? pageSize, [FromQuery]string sortBy, [FromQuery]SortOrder sortOrder){
             page ??= 1;
             pageSize ??= 10;
@@ -72,6 +73,31 @@ namespace Transactions.Controllers{
             var listToReturn = await _transactionsService.GetTransactions(transactionKinds, startDate, endDate, page.Value, pageSize.Value, sortBy, sortOrder);
 
             return Ok(listToReturn);
+        }
+
+        [HttpPost("transaction/{id}/categorize")]
+        public async Task<IActionResult> CategorizeTransaction([FromRoute] string id, [FromBody] TransactionCategorizeCommand transactionCategorizeCommand){
+            List<Errors> errors = new List<Errors>();
+            if(string.IsNullOrEmpty(id)){
+                errors.Add(new Errors{Tag = "id", Error = ErrEnum.Required, Message = Validate.GetEnumDescription(ErrEnum.Required)});
+            }
+            if(string.IsNullOrEmpty(transactionCategorizeCommand.Catcode)){
+                errors.Add(new Errors{Tag = "transaction-categorize-command", Error = ErrEnum.Required, Message = Validate.GetEnumDescription(ErrEnum.Required)});
+            }
+            if(errors.Count>0){
+                return BadRequest(errors);
+            }
+
+            var problem = await _transactionsService.CategorizeTransaction(id, transactionCategorizeCommand);
+
+            if(problem!=null){
+                if(problem is BusinessProblem){
+                    Response.StatusCode = 440;
+                    return new JsonResult(problem);
+                }
+            }
+
+            return Ok("Transaction splitted");
         }
     }
 }

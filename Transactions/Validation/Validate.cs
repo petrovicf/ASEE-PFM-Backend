@@ -138,7 +138,7 @@ namespace Transactions.Validation{
             };
         }
 
-        private static string GetEnumDescription(Enum value)
+        public static string GetEnumDescription(Enum value)
         {
             FieldInfo fi = value.GetType().GetField(value.ToString());
 
