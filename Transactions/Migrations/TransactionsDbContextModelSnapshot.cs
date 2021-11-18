@@ -39,6 +39,26 @@ namespace Transactions.Migrations
                     b.ToTable("categories");
                 });
 
+            modelBuilder.Entity("Transactions.Database.Entities.SplitEntity", b =>
+                {
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Catcode")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("TransactionId", "Catcode");
+
+                    b.HasIndex("Catcode");
+
+                    b.ToTable("splits");
+                });
+
             modelBuilder.Entity("Transactions.Database.Entities.TransactionEntity", b =>
                 {
                     b.Property<string>("Id")
@@ -86,6 +106,25 @@ namespace Transactions.Migrations
                     b.ToTable("transactions");
                 });
 
+            modelBuilder.Entity("Transactions.Database.Entities.SplitEntity", b =>
+                {
+                    b.HasOne("Transactions.Database.Entities.CategoryEntity", "Category")
+                        .WithMany("Splits")
+                        .HasForeignKey("Catcode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Transactions.Database.Entities.TransactionEntity", "Transaction")
+                        .WithMany("Splits")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Transaction");
+                });
+
             modelBuilder.Entity("Transactions.Database.Entities.TransactionEntity", b =>
                 {
                     b.HasOne("Transactions.Database.Entities.CategoryEntity", "Category")
@@ -97,7 +136,14 @@ namespace Transactions.Migrations
 
             modelBuilder.Entity("Transactions.Database.Entities.CategoryEntity", b =>
                 {
+                    b.Navigation("Splits");
+
                     b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("Transactions.Database.Entities.TransactionEntity", b =>
+                {
+                    b.Navigation("Splits");
                 });
 #pragma warning restore 612, 618
         }

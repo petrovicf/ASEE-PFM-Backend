@@ -41,5 +41,10 @@ namespace Transactions.Services{
             
             return 0;
         }
+
+        public async Task<Problem> SplitTransaction(string id, SplitTransactionCommand splitTransactionCommand)
+        {
+            return await _transactionsRepository.Split(id, splitTransactionCommand);
+        }
     }
 }

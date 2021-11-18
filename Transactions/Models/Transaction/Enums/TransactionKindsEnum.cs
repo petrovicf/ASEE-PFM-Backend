@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Newtonsoft.Json;
 
 namespace Transactions.Models.Transaction.Enums{
     public enum TransactionKindsEnum{

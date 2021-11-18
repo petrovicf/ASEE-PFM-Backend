@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Transactions.Migrations
 {
-    public partial class DbMigration : Migration
+    public partial class FinalMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -46,6 +46,36 @@ namespace Transactions.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "splits",
+                columns: table => new
+                {
+                    TransactionId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Catcode = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Amount = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_splits", x => new { x.TransactionId, x.Catcode });
+                    table.ForeignKey(
+                        name: "FK_splits_categories_Catcode",
+                        column: x => x.Catcode,
+                        principalTable: "categories",
+                        principalColumn: "Code",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_splits_transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "transactions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_splits_Catcode",
+                table: "splits",
+                column: "Catcode");
+
             migrationBuilder.CreateIndex(
                 name: "IX_transactions_Catcode",
                 table: "transactions",
@@ -54,6 +84,9 @@ namespace Transactions.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "splits");
+
             migrationBuilder.DropTable(
                 name: "transactions");
 

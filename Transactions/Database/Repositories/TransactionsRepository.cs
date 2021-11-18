@@ -88,5 +88,35 @@ namespace Transactions.Database.Repositories{
             await _dbContext.SaveChangesAsync();
             return 0;
         }
+
+        public async Task<Problem> Split(string id, SplitTransactionCommand splitTransactionCommand)
+        {
+            var notExisting = splitTransactionCommand.Splits.Where(s=>!_dbContext.Categories.Any(c=>c.Code==s.Catcode));
+            if(notExisting.Count()>0){
+                return new BusinessProblem{
+                    ProblemLiteral = "provided-category-does-not-exist",
+                    ProblemMessage = "Provided category does not exist",
+                    ProblemDetails = $"Category with code {notExisting.First().Catcode} does not exist in database"
+                };
+            }
+            if(!await _dbContext.Transactions.AnyAsync(t=>t.Id==id)){
+                return new BusinessProblem{
+                    ProblemLiteral = "provided-transaction-does-not-exist",
+                    ProblemMessage = "Provided transaction does not exist",
+                    ProblemDetails = $"Transaction with id {id} does not exist in database"
+                };
+            }
+
+            var splitsQuery = splitTransactionCommand.Splits.AsQueryable();
+            if(splitsQuery.Sum(s=>s.Amount) > _dbContext.Transactions.Where(t=>t.Id==id).Sum(t=>t.Amount)){
+                return new BusinessProblem{
+                    ProblemLiteral = "split-amount-over-transaction-amount",
+                    ProblemMessage = "Split amount is larger then transaction amount",
+                    ProblemDetails = ""
+                };
+            }
+
+            return null;
+        }
     }
 }

@@ -47,8 +47,6 @@ namespace Transactions.Controllers{
 
             var transactionList = csvParser.ReadFromFile(filePath, Encoding.ASCII).ToList();
 
-            transactionList.RemoveAt(transactionList.Count-1);
-
             var validationProblem = Validate.ValidateList<CsvMappingResult<TransactionCsvEntity>>(transactionList);
 
             if(validationProblem.Errors.Count>0){
@@ -91,6 +89,20 @@ namespace Transactions.Controllers{
             var problem = await _transactionsService.CategorizeTransaction(id, transactionCategorizeCommand);
 
             if(problem!=null){
+                if(problem is BusinessProblem){
+                    Response.StatusCode = 440;
+                    return new JsonResult(problem);
+                }
+            }
+
+            return Ok("Transaction splitted");
+        }
+
+        [HttpPost("transaction/{id}/split")]
+        public async Task<IActionResult> SplitTransaction([FromRoute] string id, [FromBody] SplitTransactionCommand splitTransactionCommand){
+            var problem = await _transactionsService.SplitTransaction(id, splitTransactionCommand);
+
+            if(problem != null){
                 if(problem is BusinessProblem){
                     Response.StatusCode = 440;
                     return new JsonResult(problem);

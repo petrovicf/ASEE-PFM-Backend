@@ -6,5 +6,6 @@ namespace Transactions.Database.Entities{
         public string Name { get; set; }
         public string ParentCode { get; set; }
         public List<TransactionEntity> Transaction { get; set; }
+        public List<SplitEntity> Splits { get; set; }
     }
 }

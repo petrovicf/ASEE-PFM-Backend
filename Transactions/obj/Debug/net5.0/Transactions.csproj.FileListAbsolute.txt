@@ -38,3 +38,4 @@ C:\Users\Instructor\Desktop\PFM Backend\Transactions\bin\Debug\net5.0\System.Dia
 C:\Users\Instructor\Desktop\PFM Backend\Transactions\bin\Debug\net5.0\TinyCsvParser.dll
 C:\Users\Instructor\Desktop\PFM Backend\Transactions\bin\Debug\net5.0\AutoMapper.dll
 C:\Users\Instructor\Desktop\PFM Backend\Transactions\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\Instructor\Desktop\PFM Backend\Transactions\bin\Debug\net5.0\Newtonsoft.Json.dll

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Transactions.Models.Category;
 using Transactions.Models.Transaction.Enums;
 
@@ -24,5 +25,6 @@ namespace Transactions.Database.Entities{
 
         public CategoryEntity Category { get; set; }
         public string Catcode { get; set; }
+        public List<SplitEntity> Splits { get; set; }
     }
 }

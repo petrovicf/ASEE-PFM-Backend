@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "qLkPILGAuNGzr8Ey64qOPBZcPPUo+aWFC0hXrA1YiHGCwLqEBWEYct5k+77Im2BqWzNoh5WALKeSgmbq+Ldvtg==",
+  "dgSpecHash": "ip4JBMoJx6F9AuDRmCrb3x8SD+Nrp5sYXr14vfeNnLoMZ24VeydMIJo+SwrXeYaZMFYXYouPL6V1r8G6Tc/RXA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Instructor\\Desktop\\PFM Backend\\Transactions\\Transactions.csproj",
   "expectedPackageFiles": [
@@ -24,6 +24,7 @@
     "C:\\Users\\Instructor\\.nuget\\packages\\microsoft.extensions.options\\5.0.0\\microsoft.extensions.options.5.0.0.nupkg.sha512",
     "C:\\Users\\Instructor\\.nuget\\packages\\microsoft.extensions.primitives\\5.0.0\\microsoft.extensions.primitives.5.0.0.nupkg.sha512",
     "C:\\Users\\Instructor\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\Instructor\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\Instructor\\.nuget\\packages\\npgsql\\5.0.10\\npgsql.5.0.10.nupkg.sha512",
     "C:\\Users\\Instructor\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\5.0.10\\npgsql.entityframeworkcore.postgresql.5.0.10.nupkg.sha512",
     "C:\\Users\\Instructor\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
