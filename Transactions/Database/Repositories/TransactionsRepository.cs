@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Transactions.Commands;
 using Transactions.Database.Entities;
@@ -12,9 +13,11 @@ using Transactions.Problems;
 namespace Transactions.Database.Repositories{
     public class TransactionsRepository : ITransactionsRepository{
         private readonly TransactionsDbContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public TransactionsRepository(TransactionsDbContext dbContext){
+        public TransactionsRepository(TransactionsDbContext dbContext, IMapper mapper){
             _dbContext=dbContext;
+            _mapper = mapper;
         }
 
         public async Task<Problem> Categorize(string id, TransactionCategorizeCommand transactionCategorizeCommand)
@@ -49,7 +52,10 @@ namespace Transactions.Database.Repositories{
             startDate ??= new DateTime(2010, 1, 1);
             endDate ??= DateTime.Today.AddYears(5);
 
-            var query = _dbContext.Transactions.AsQueryable();
+            var query = _dbContext.Transactions.AsQueryable().SetSplits(_dbContext.Splits.ToList());
+            /*var splits = _dbContext.Splits.AsQueryable();
+
+            await query.ForEachAsync(async t=>t.Splits=await splits.Where(s=>s.TransactionId==t.Id).ToListAsync());*/
 
             if(transactionKinds!=null && transactionKinds.Count>0){
                 query = query.Where(t=>transactionKinds.Contains(t.Kind) && t.Date.Date >= startDate.Value.Date && t.Date.Date <= endDate.Value.Date);
@@ -68,7 +74,7 @@ namespace Transactions.Database.Repositories{
             }
 
             query = query.Skip((page-1) * pageSize).Take(pageSize);
-            var pagesSortedTransactionsList = await query.ToListAsync();
+            var pagedSortedTransactionsWithSplitsList = await query.ToListAsync();
 
             return new TransactionPagedList<TransactionEntity>{
                 TotalCount = totalCount,
@@ -77,7 +83,7 @@ namespace Transactions.Database.Repositories{
                 TotalPages = (int)totalPages,
                 SortOrder = sortOrder,
                 SortBy = sortBy,
-                Items=pagesSortedTransactionsList
+                Items=pagedSortedTransactionsWithSplitsList
             };
         }
 
@@ -115,6 +121,17 @@ namespace Transactions.Database.Repositories{
                     ProblemDetails = ""
                 };
             }
+
+            var splitsToRemove = _dbContext.Splits.AsQueryable().Where(s=>s.TransactionId==id);
+            if(await splitsToRemove.CountAsync()>0){
+                _dbContext.Splits.RemoveRange(splitsToRemove);
+            }
+
+            List<SplitEntity> splits = new List<SplitEntity>(_mapper.Map<List<SplitEntity>>(splitsQuery.ToList()));
+            splits.ForEach(s=>s.TransactionId=id);
+            
+            await _dbContext.Splits.AddRangeAsync(splits);
+            await _dbContext.SaveChangesAsync();
 
             return null;
         }

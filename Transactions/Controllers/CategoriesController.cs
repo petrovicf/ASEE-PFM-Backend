@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using TinyCsvParser;
 using TinyCsvParser.Mapping;
 using Transactions.Commands;
@@ -33,7 +34,7 @@ namespace Transactions.Controllers{
         }
 
         [HttpPost("categories/import")]
-        public async Task<IActionResult> ImportCategories([FromForm] IFormFile csvFile){
+        public async Task<IActionResult> ImportCategories([FromForm(Name = "csv-file")] IFormFile csvFile){
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvCategoryMapping csvCategoryMapping = new CsvCategoryMapping();
             CsvParser<CategoryCsv> csvParser = new CsvParser<CategoryCsv>(csvParserOptions, csvCategoryMapping);
@@ -58,10 +59,10 @@ namespace Transactions.Controllers{
         }
 
         [HttpGet("spending-analytics")]
-        public IActionResult ViewSpendingByCategory([FromQuery] string catcode, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] DirectionsEnum? direction){
+        public IActionResult ViewSpendingByCategory([FromQuery] string catcode, [FromQuery(Name = "start-date")] DateTime? startDate, [FromQuery(Name = "end-date")] DateTime? endDate, [FromQuery] DirectionsEnum? direction){
             var spendings = _categoriesService.GetSpendingsByCategory(catcode, startDate, endDate, direction);
             
-            return Ok(spendings);
+            return Ok(JsonConvert.SerializeObject(spendings,Formatting.Indented));
         }
     }
 }

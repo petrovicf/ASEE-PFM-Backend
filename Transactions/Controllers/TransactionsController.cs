@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using TinyCsvParser;
 using TinyCsvParser.Mapping;
 using Transactions.Commands;
+using Newtonsoft.Json;
 using Transactions.Database.Entities;
 using Transactions.Files;
 using Transactions.Mappings;
@@ -38,13 +39,13 @@ namespace Transactions.Controllers{
         }
 
         [HttpPost("transactions/import")]
-        public async Task<IActionResult> ImportTransactions([FromForm] IFormFile csvFile){
+        public async Task<IActionResult> ImportTransactions([FromForm(Name = "csv-file")] IFormFile csvFile){
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvTransactionMapping csvTransactionMapping = new CsvTransactionMapping();
             CsvParser<TransactionCsvEntity> csvParser = new CsvParser<TransactionCsvEntity>(csvParserOptions,csvTransactionMapping);
 
             string filePath = await FileMethods.GetFilePath(csvFile);
-
+            
             var transactionList = csvParser.ReadFromFile(filePath, Encoding.ASCII).ToList();
 
             var validationProblem = Validate.ValidateList<CsvMappingResult<TransactionCsvEntity>>(transactionList);
@@ -63,14 +64,14 @@ namespace Transactions.Controllers{
         }
 
         [HttpGet("transactions")]
-        public async Task<IActionResult> GetTransactions([FromQuery]List<TransactionKindsEnum> transactionKinds, [FromQuery]DateTime? startDate, [FromQuery]DateTime? endDate, [FromQuery]int? page,
-        [FromQuery]int? pageSize, [FromQuery]string sortBy, [FromQuery]SortOrder sortOrder){
+        public async Task<IActionResult> GetTransactions([FromQuery(Name = "transaction-kinds")]List<TransactionKindsEnum> transactionKinds, [FromQuery(Name = "start-date")]DateTime? startDate, [FromQuery(Name = "end-date")]DateTime? endDate, [FromQuery]int? page,
+        [FromQuery(Name = "page-size")]int? pageSize, [FromQuery(Name = "sort-by")]string sortBy, [FromQuery(Name = "sort-order")]SortOrder sortOrder){
             page ??= 1;
             pageSize ??= 10;
 
             var listToReturn = await _transactionsService.GetTransactions(transactionKinds, startDate, endDate, page.Value, pageSize.Value, sortBy, sortOrder);
 
-            return Ok(listToReturn);
+            return Ok(JsonConvert.SerializeObject(listToReturn,Formatting.Indented));
         }
 
         [HttpPost("transaction/{id}/categorize")]

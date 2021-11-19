@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Transactions.Database.Entities;
 
 namespace Transactions.Database{
     public static class DatabaseExtensions{
@@ -46,6 +48,13 @@ namespace Transactions.Database{
             var result = orderByGeneric.Invoke(null, new object[]{source, lambda}); //source.OrderBy(x=>x.[propertyName])
 
             return result as IOrderedQueryable<TSource>;
+        }
+
+        public static IQueryable<T> SetSplits<T>(this IQueryable<T> queryable, List<SplitEntity> splits) where T:TransactionEntity{
+            var list = queryable.ToList();
+            list.ForEach(t=>t.Splits = splits.Where(s=>s.TransactionId==t.Id).ToList());
+
+            return queryable;
         }
 
         private static string UpperFirst(string s){

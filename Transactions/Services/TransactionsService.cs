@@ -25,12 +25,12 @@ namespace Transactions.Services{
             return await _transactionsRepository.Categorize(id, transactionCategorizeCommand);;
         }
 
-        public async Task<TransactionPagedList<Transaction>> GetTransactions(List<TransactionKindsEnum> transactionKinds = null, DateTime? startDate=null, DateTime? endDate = null, int page = 1,
+        public async Task<TransactionPagedList<TransactionWithSplits>> GetTransactions(List<TransactionKindsEnum> transactionKinds = null, DateTime? startDate=null, DateTime? endDate = null, int page = 1,
         int pageSize = 10, string sortBy = null, SortOrder sortOrder = SortOrder.Asc)
         {
             var pagedList = await _transactionsRepository.Get(transactionKinds, startDate, endDate, page, pageSize, sortBy, sortOrder);
 
-            return _mapper.Map<TransactionPagedList<Transaction>>(pagedList);
+            return _mapper.Map<TransactionPagedList<TransactionWithSplits>>(pagedList);
         }
 
         public async Task<int> InsertTransactions(List<Transaction> transactions)
