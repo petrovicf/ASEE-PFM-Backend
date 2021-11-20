@@ -40,6 +40,17 @@ namespace Transactions.Controllers{
 
         [HttpPost("transactions/import")]
         public async Task<IActionResult> ImportTransactions([FromForm(Name = "csv-file")] IFormFile csvFile){
+            if(csvFile==null){
+                return BadRequest(new ValidationProblem{
+                    Errors = new List<Errors>{
+                        new Errors{
+                            Tag = "csv-file",
+                            Error = ErrEnum.Required,
+                            Message = Validate.GetEnumDescription(ErrEnum.Required)
+                        }
+                    }
+                });
+            }
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvTransactionMapping csvTransactionMapping = new CsvTransactionMapping();
             CsvParser<TransactionCsvEntity> csvParser = new CsvParser<TransactionCsvEntity>(csvParserOptions,csvTransactionMapping);
@@ -80,7 +91,7 @@ namespace Transactions.Controllers{
             if(string.IsNullOrEmpty(id)){
                 errors.Add(new Errors{Tag = "id", Error = ErrEnum.Required, Message = Validate.GetEnumDescription(ErrEnum.Required)});
             }
-            if(string.IsNullOrEmpty(transactionCategorizeCommand.Catcode)){
+            if(transactionCategorizeCommand == null){
                 errors.Add(new Errors{Tag = "transaction-categorize-command", Error = ErrEnum.Required, Message = Validate.GetEnumDescription(ErrEnum.Required)});
             }
             if(errors.Count>0){

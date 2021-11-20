@@ -47,6 +47,8 @@ namespace Transactions.Mappings{
                 .ForMember(c=>c.ParentCode, mo=>mo.MapFrom(cs=>cs.Result.ParentCode))
                 .ForMember(c=>c.Name, mo=>mo.MapFrom(cs=>cs.Result.Name));
             CreateMap<Category, CategoryEntity>();
+            CreateMap<CategoryEntity, Category>();
+            CreateMap<CategoryList<CategoryEntity>, CategoryList<Category>>();
 
             CreateMap<SingleCategorySplit, SplitEntity>();
             CreateMap<SplitEntity, SingleCategorySplit>();

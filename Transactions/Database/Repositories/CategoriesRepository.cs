@@ -15,37 +15,57 @@ namespace Transactions.Database.Repositories{
             _dbContext = dbContext;
         }
 
+        public CategoryList<CategoryEntity> Get(string parentId)
+        {
+            var categoriesQuery = _dbContext.Categories.AsQueryable();
+
+            if(!string.IsNullOrEmpty(parentId)){
+                categoriesQuery = categoriesQuery.Where(c=>c.ParentCode==parentId);
+            }
+
+            return new CategoryList<CategoryEntity>{
+                Items = categoriesQuery.ToList()
+            };
+        }
+
         public SpendingsByCategory GetSpendings(string catcode, DateTime? startDate, DateTime? endDate, DirectionsEnum? direction)
         {
             startDate ??= new DateTime(2010, 1, 1);
             endDate ??= DateTime.Today.AddYears(5);
 
             var transactionsQuery = _dbContext.Transactions.AsQueryable().Where(t=>t.Date.Date > startDate.Value.Date && t.Date.Date < endDate.Value.Date);
-            transactionsQuery = direction == null ? string.IsNullOrEmpty(catcode) ? transactionsQuery : transactionsQuery.Where(t=>t.Catcode==catcode)
-                : string.IsNullOrEmpty(catcode) ? transactionsQuery.Where(t=>t.Direction==direction) : transactionsQuery.Where(t=>t.Direction==direction && t.Catcode==catcode);
-
-            if(!string.IsNullOrEmpty(catcode)){
-                return new SpendingsByCategory{
-                    Groups = new List<SpendingInCategory>{
-                        new SpendingInCategory{
-                            Catcode = catcode,
-                            Amount = Math.Round(transactionsQuery.Sum(t=>t.Amount), 2),
-                            Count = transactionsQuery.Count()
-                        }
-                    }
-                };
-            }
+            var categoriesQuery = _dbContext.Categories.AsQueryable();
+            transactionsQuery = direction == null ? string.IsNullOrEmpty(catcode) ? transactionsQuery : transactionsQuery.Where(t=>categoriesQuery.Any(c=>c.ParentCode==catcode && c.Code==t.Catcode))
+                : string.IsNullOrEmpty(catcode) ? transactionsQuery.Where(t=>t.Direction==direction) : transactionsQuery.Where(t=>t.Direction==direction && categoriesQuery.Any(c=>c.ParentCode==catcode && c.Code==t.Catcode));
 
             List<SpendingInCategory> spendings = new List<SpendingInCategory>();
+            IEnumerable<TransactionEntity> query;
+            string key;
 
-            foreach (var group in transactionsQuery.AsEnumerable().GroupBy(t=>t.Catcode))
-            {
-                spendings.Add(new SpendingInCategory{
-                    Catcode = group.Key,
-                    Amount = Math.Round(group.Sum(t=>t.Amount), 2),
-                    Count = group.Count()
-                });
+            if(!string.IsNullOrEmpty(catcode)){
+                foreach (var group in transactionsQuery.AsEnumerable().GroupBy(t=>t.Catcode))
+                {
+                    spendings.Add(new SpendingInCategory{
+                        Catcode = group.Key,
+                        Amount = Math.Round(group.Sum(t=>t.Amount), 2),
+                        Count = group.Count()
+                    });
+                }
             }
+            else{
+                foreach (var group in transactionsQuery.AsEnumerable().GroupBy(t=>t.Catcode))
+                {
+                    key = group.Key;
+                    query = group.AsEnumerable().Union(transactionsQuery.Where(t=>categoriesQuery.Any(c=>c.ParentCode==key && c.Code==t.Catcode)));
+                    spendings.Add(new SpendingInCategory{
+                        Catcode = key,
+                        Amount = Math.Round(query.Sum(t=>t.Amount), 2),
+                        Count = query.Count()
+                    });
+                }
+            }
+
+            
 
             return new SpendingsByCategory{
                 Groups = spendings

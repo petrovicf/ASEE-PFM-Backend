@@ -16,12 +16,13 @@ using Transactions.Mappings;
 using Transactions.Mappings.Entities;
 using Transactions.Models.Category;
 using Transactions.Models.Transaction.Enums;
+using Transactions.Problems;
 using Transactions.Services;
 using Transactions.Validation;
 
 namespace Transactions.Controllers{
     [ApiController]
-//    [Route("categories")]
+    [Route("categories")]
     public class CategoriesController : ControllerBase{
         private readonly ILogger<CategoriesController> _logger;
         private readonly IMapper _mapper;
@@ -33,8 +34,19 @@ namespace Transactions.Controllers{
             _categoriesService = categoriesService;
         }
 
-        [HttpPost("categories/import")]
+        [HttpPost("import")]
         public async Task<IActionResult> ImportCategories([FromForm(Name = "csv-file")] IFormFile csvFile){
+            if(csvFile==null){
+                return BadRequest(new ValidationProblem{
+                    Errors = new List<Errors>{
+                        new Errors{
+                            Tag = "csv-file",
+                            Error = ErrEnum.Required,
+                            Message = Validate.GetEnumDescription(ErrEnum.Required)
+                        }
+                    }
+                });
+            }
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvCategoryMapping csvCategoryMapping = new CsvCategoryMapping();
             CsvParser<CategoryCsv> csvParser = new CsvParser<CategoryCsv>(csvParserOptions, csvCategoryMapping);
@@ -58,11 +70,11 @@ namespace Transactions.Controllers{
             return Ok("Categories imported");
         }
 
-        [HttpGet("spending-analytics")]
-        public IActionResult ViewSpendingByCategory([FromQuery] string catcode, [FromQuery(Name = "start-date")] DateTime? startDate, [FromQuery(Name = "end-date")] DateTime? endDate, [FromQuery] DirectionsEnum? direction){
-            var spendings = _categoriesService.GetSpendingsByCategory(catcode, startDate, endDate, direction);
-            
-            return Ok(JsonConvert.SerializeObject(spendings,Formatting.Indented));
+        [HttpGet]
+        public IActionResult GetCategories([FromQuery(Name = "parent-id")] string parentId){
+            var listToReturn = _categoriesService.GetCategories(parentId);
+
+            return Ok(JsonConvert.SerializeObject(listToReturn,Formatting.Indented));
         }
     }
 }

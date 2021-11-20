@@ -18,6 +18,11 @@ namespace Transactions.Services{
             _mapper = mapper;
         }
 
+        public CategoryList<Category> GetCategories(string parentId)
+        {
+            return _mapper.Map<CategoryList<Category>>(_categoriesRepository.Get(parentId));
+        }
+
         public SpendingsByCategory GetSpendingsByCategory(string catcode, DateTime? startDate, DateTime? endDate, DirectionsEnum? direction)
         {
             return _categoriesRepository.GetSpendings(catcode, startDate, endDate, direction);

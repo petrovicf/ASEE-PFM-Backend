@@ -58,7 +58,8 @@ namespace Transactions.Database{
         }
 
         private static string UpperFirst(string s){
-            return char.ToUpper(s[0]) + s.Substring(1);
+            s = s.Split('-').Length==2 ? char.ToUpper(s.Split('-')[0][0]) + s.Split('-')[0].Substring(1) + char.ToUpper(s.Split('-')[1][0]) + s.Split('-')[1].Substring(1) : char.ToUpper(s[0])+ s.Substring(1);
+            return s;
         }
     }
 }

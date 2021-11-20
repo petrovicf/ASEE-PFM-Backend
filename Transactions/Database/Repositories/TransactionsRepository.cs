@@ -63,6 +63,7 @@ namespace Transactions.Database.Repositories{
 
             var totalCount = await query.CountAsync();
             var totalPages = Math.Ceiling((double)totalCount/pageSize);
+            page = page>totalPages ? (int)totalPages : page;
 
             if(!string.IsNullOrEmpty(sortBy)){
                 if(sortOrder==SortOrder.Desc){
