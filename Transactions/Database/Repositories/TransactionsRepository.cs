@@ -29,6 +29,9 @@ namespace Transactions.Database.Repositories{
                 transactionsToUpdate = _dbContext.Transactions.FromSqlInterpolated($"SELECT * FROM transactions WHERE {rule.Predicate}").ToList();
                 transactionsToUpdate.ForEach(t=>t.Catcode=rule.Catcode);
                 _dbContext.UpdateRange(transactionsToUpdate);
+                if(transactionsToUpdate==null || transactionsToUpdate.Count==0){
+                    throw new Exception("null value");
+                }
             }
 
             await _dbContext.SaveChangesAsync();
@@ -109,6 +112,7 @@ namespace Transactions.Database.Repositories{
             await _dbContext.Transactions.AddRangeAsync(transToInsert);
 
             await _dbContext.SaveChangesAsync();
+            
             return 0;
         }
 

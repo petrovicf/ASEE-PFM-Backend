@@ -70,10 +70,10 @@ namespace Transactions.Controllers{
             }
 
             var transactions = _mapper.Map<List<CsvMappingResult<TransactionCsvEntity>>, List<Models.Transaction.Transaction>>(transactionList);
+            
+            System.IO.File.Delete(filePath);
 
             await _transactionsService.InsertTransactions(transactions);
-
-            System.IO.File.Delete(filePath);
 
             return Ok("Transaction splitted");
         }
@@ -107,7 +107,7 @@ namespace Transactions.Controllers{
             if(problem!=null){
                 if(problem is BusinessProblem){
                     Response.StatusCode = 440;
-                    return new JsonResult(JsonConvert.SerializeObject(problem, Formatting.Indented));
+                    return new ObjectResult(JsonConvert.SerializeObject(problem, Formatting.Indented)){StatusCode = 440};
                 }
             }
 
@@ -120,8 +120,7 @@ namespace Transactions.Controllers{
 
             if(problem != null){
                 if(problem is BusinessProblem){
-                    Response.StatusCode = 440;
-                    return new JsonResult(JsonConvert.SerializeObject(problem, Formatting.Indented));
+                    return new ObjectResult(JsonConvert.SerializeObject(problem, Formatting.Indented)){StatusCode=440};
                 }
             }
 

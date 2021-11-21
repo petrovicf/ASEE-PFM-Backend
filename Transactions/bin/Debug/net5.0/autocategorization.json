@@ -2,7 +2,7 @@
     "Rules":[
         {
             "Catcode": "53",
-            "Predicate": "BeneficiaryName LIKE '%home%';"
+            "Predicate": "'BeneficiaryName' LIKE '%home%'"
         }
     ]
 }

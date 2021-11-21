@@ -49,10 +49,8 @@ namespace Transactions.Services{
         public async Task<int> InsertTransactions(List<Transaction> transactions)
         {
             List<TransactionEntity> transToInsert = _mapper.Map<List<Models.Transaction.Transaction>, List<TransactionEntity>>(transactions);
-
-            await _transactionsRepository.Insert(transToInsert);
             
-            return 0;
+            return await _transactionsRepository.Insert(transToInsert);
         }
 
         public async Task<Problem> SplitTransaction(string id, SplitTransactionCommand splitTransactionCommand)
