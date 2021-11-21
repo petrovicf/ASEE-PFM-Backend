@@ -2,10 +2,10 @@ using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Transactions.Models.Transaction.Enums{
-    [Serializable]
-    [DataContract(Name = "transaction-kinds")]
+    [JsonConverter(typeof(StringEnumConverter))] 
     public enum TransactionKindsEnum{
         [Description("Deposit")]
         Dep,

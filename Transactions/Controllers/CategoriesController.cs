@@ -37,7 +37,7 @@ namespace Transactions.Controllers{
         [HttpPost("import")]
         public async Task<IActionResult> ImportCategories([FromForm(Name = "csv-file")] IFormFile csvFile){
             if(csvFile==null){
-                return BadRequest(new ValidationProblem{
+                return BadRequest(JsonConvert.SerializeObject(new ValidationProblem{
                     Errors = new List<Errors>{
                         new Errors{
                             Tag = "csv-file",
@@ -45,7 +45,7 @@ namespace Transactions.Controllers{
                             Message = Validate.GetEnumDescription(ErrEnum.Required)
                         }
                     }
-                });
+                },Formatting.Indented));
             }
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvCategoryMapping csvCategoryMapping = new CsvCategoryMapping();
@@ -58,7 +58,7 @@ namespace Transactions.Controllers{
             var validationProblem = Validate.ValidateList<CsvMappingResult<CategoryCsv>>(categoryList);
 
             if(validationProblem.Errors.Count>0){
-                return BadRequest(validationProblem);
+                return BadRequest(JsonConvert.SerializeObject(validationProblem,Formatting.Indented));
             }
 
             var categories = _mapper.Map<List<CsvMappingResult<CategoryCsv>>, List<Category>>(categoryList);

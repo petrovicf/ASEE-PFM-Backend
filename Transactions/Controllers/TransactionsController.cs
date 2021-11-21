@@ -41,7 +41,7 @@ namespace Transactions.Controllers{
         [HttpPost("transactions/import")]
         public async Task<IActionResult> ImportTransactions([FromForm(Name = "csv-file")] IFormFile csvFile){
             if(csvFile==null){
-                return BadRequest(new ValidationProblem{
+                return BadRequest(JsonConvert.SerializeObject(new ValidationProblem{
                     Errors = new List<Errors>{
                         new Errors{
                             Tag = "csv-file",
@@ -49,7 +49,7 @@ namespace Transactions.Controllers{
                             Message = Validate.GetEnumDescription(ErrEnum.Required)
                         }
                     }
-                });
+                },Formatting.Indented));
             }
             CsvParserOptions csvParserOptions = new CsvParserOptions(true, ',');
             CsvTransactionMapping csvTransactionMapping = new CsvTransactionMapping();
@@ -62,7 +62,7 @@ namespace Transactions.Controllers{
             var validationProblem = Validate.ValidateList<CsvMappingResult<TransactionCsvEntity>>(transactionList);
 
             if(validationProblem.Errors.Count>0){
-                return BadRequest(validationProblem);
+                return BadRequest(JsonConvert.SerializeObject(validationProblem, Formatting.Indented));
             }
 
             var transactions = _mapper.Map<List<CsvMappingResult<TransactionCsvEntity>>, List<Models.Transaction.Transaction>>(transactionList);
@@ -95,7 +95,7 @@ namespace Transactions.Controllers{
                 errors.Add(new Errors{Tag = "transaction-categorize-command", Error = ErrEnum.Required, Message = Validate.GetEnumDescription(ErrEnum.Required)});
             }
             if(errors.Count>0){
-                return BadRequest(errors);
+                return BadRequest(JsonConvert.SerializeObject(errors, Formatting.Indented));
             }
 
             var problem = await _transactionsService.CategorizeTransaction(id, transactionCategorizeCommand);
@@ -103,7 +103,7 @@ namespace Transactions.Controllers{
             if(problem!=null){
                 if(problem is BusinessProblem){
                     Response.StatusCode = 440;
-                    return new JsonResult(problem);
+                    return new JsonResult(JsonConvert.SerializeObject(problem, Formatting.Indented));
                 }
             }
 
@@ -117,7 +117,7 @@ namespace Transactions.Controllers{
             if(problem != null){
                 if(problem is BusinessProblem){
                     Response.StatusCode = 440;
-                    return new JsonResult(problem);
+                    return new JsonResult(JsonConvert.SerializeObject(problem, Formatting.Indented));
                 }
             }
 

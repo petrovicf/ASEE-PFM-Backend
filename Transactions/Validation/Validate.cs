@@ -56,40 +56,40 @@ namespace Transactions.Validation{
                         if(property.Required){
                             if(string.IsNullOrEmpty(value.ToString())){
                                 err = ErrEnum.Required;
-                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                errors.Add(CreateError(SetOutputPropertyName(property.PropertyName.Split('.')[1]), err, GetEnumDescription(err)));
                                 break;
                             }
                         }
                         if(property.PropertyName.ToLower().Contains("date")){
                             if(!DateTime.TryParse(value, out pomDate)){
                                 err = ErrEnum.InvalidFormat;
-                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                errors.Add(CreateError(SetOutputPropertyName(property.PropertyName.Split('.')[1]), err, GetEnumDescription(err)));
                                 break;
                             }
                         }
                         if((property.MinLength > 0 && property.MaxLength > 0)){
                             if(value.Length < property.MinLength){
                                 err = ErrEnum.MinLength;
-                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                errors.Add(CreateError(SetOutputPropertyName(property.PropertyName.Split('.')[1]), err, GetEnumDescription(err)));
                                 break;
                             }
                             else if (value.Length > property.MinLength){
                                 err = ErrEnum.MaxLength;
-                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                errors.Add(CreateError(SetOutputPropertyName(property.PropertyName.Split('.')[1]), err, GetEnumDescription(err)));
                                 break;
                             }
                         }
                         if(property.IsNumber){
                             if(!double.TryParse(Regex.Match(value, property.Pattern).Value, out pomDouble)){
                                 err = ErrEnum.InvalidFormat;
-                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                errors.Add(CreateError(SetOutputPropertyName(property.PropertyName.Split('.')[1]), err, GetEnumDescription(err)));
                                 break;
                             }
                         }
                         if(property.IsEnum && value.Length > 0){
                             if(!TryParseEnums(value)){
                                 err = ErrEnum.UnknownEnum;
-                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                errors.Add(CreateError(SetOutputPropertyName(property.PropertyName.Split('.')[1]), err, GetEnumDescription(err)));
                                 break;
                             }
                         }
@@ -114,7 +114,7 @@ namespace Transactions.Validation{
                         if(property.Required){
                             if(string.IsNullOrEmpty(value.ToString())){
                                 err = ErrEnum.Required;
-                                errors.Add(CreateError(property.PropertyName.Split('.')[1], err, GetEnumDescription(err)));
+                                errors.Add(CreateError(SetOutputPropertyName(property.PropertyName.Split('.')[1]), err, GetEnumDescription(err)));
                                 break;
                             }
                         }
@@ -122,6 +122,20 @@ namespace Transactions.Validation{
                 }
 
                 return errors;
+        }
+
+        private static string SetOutputPropertyName(string propName){
+            string s = $"{char.ToLower(propName[0])}";
+            for(int i=1;i<propName.Length;i++){
+                if(char.IsUpper(propName[i])){
+                    s+=$"-{char.ToLower(propName[i])}";
+                }
+                else{
+                    s+=propName[i];
+                }
+            }
+
+            return s;
         }
 
         private static bool TryParseEnums(string enumeration){

@@ -49,6 +49,10 @@ namespace Transactions
             services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+            //cors
+            services.AddCors();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +64,8 @@ namespace Transactions
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transactions v1"));
             }
+
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
 
             app.UseRouting();
 

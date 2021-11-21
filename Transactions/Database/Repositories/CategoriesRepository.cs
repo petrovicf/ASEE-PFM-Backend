@@ -33,7 +33,7 @@ namespace Transactions.Database.Repositories{
             startDate ??= new DateTime(2010, 1, 1);
             endDate ??= DateTime.Today.AddYears(5);
 
-            var transactionsQuery = _dbContext.Transactions.AsQueryable().Where(t=>t.Date.Date > startDate.Value.Date && t.Date.Date < endDate.Value.Date);
+            var transactionsQuery = _dbContext.Transactions.AsQueryable().Where(t=>t.Date.Date > startDate.Value.Date && t.Date.Date < endDate.Value.Date && t.Catcode!=null);
             var categoriesQuery = _dbContext.Categories.AsQueryable();
             transactionsQuery = direction == null ? string.IsNullOrEmpty(catcode) ? transactionsQuery : transactionsQuery.Where(t=>categoriesQuery.Any(c=>c.ParentCode==catcode && c.Code==t.Catcode))
                 : string.IsNullOrEmpty(catcode) ? transactionsQuery.Where(t=>t.Direction==direction) : transactionsQuery.Where(t=>t.Direction==direction && categoriesQuery.Any(c=>c.ParentCode==catcode && c.Code==t.Catcode));
