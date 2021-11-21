@@ -32,7 +32,7 @@ namespace Transactions.Database.Repositories{
         {
             startDate ??= new DateTime(2010, 1, 1);
             endDate ??= DateTime.Today.AddYears(5);
-
+            
             var transactionsQuery = _dbContext.Transactions.AsQueryable().Where(t=>t.Date.Date > startDate.Value.Date && t.Date.Date < endDate.Value.Date && t.Catcode!=null);
             var categoriesQuery = _dbContext.Categories.AsQueryable();
             transactionsQuery = direction == null ? string.IsNullOrEmpty(catcode) ? transactionsQuery : transactionsQuery.Where(t=>categoriesQuery.Any(c=>c.ParentCode==catcode && c.Code==t.Catcode))
@@ -53,7 +53,7 @@ namespace Transactions.Database.Repositories{
                 }
             }
             else{
-                foreach (var group in transactionsQuery.AsEnumerable().GroupBy(t=>t.Catcode))
+                foreach (var group in transactionsQuery.Where(t=>categoriesQuery.Any(c=>c.Code==t.Catcode && string.IsNullOrEmpty(c.ParentCode))).AsEnumerable().GroupBy(t=>t.Catcode))
                 {
                     key = group.Key;
                     query = group.AsEnumerable().Union(transactionsQuery.Where(t=>categoriesQuery.Any(c=>c.ParentCode==key && c.Code==t.Catcode)));

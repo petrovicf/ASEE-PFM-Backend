@@ -13,5 +13,6 @@ namespace Transactions.Services{
         int pageSize = 10, string sortBy = null, SortOrder sortOrder = SortOrder.Asc);
         Task<Problem> CategorizeTransaction(string id, TransactionCategorizeCommand transactionCategorizeCommand);
         Task<Problem> SplitTransaction(string id, SplitTransactionCommand splitTransactionCommand);
+        Task<int> AutoCategorizeTransactions();
     }
 }

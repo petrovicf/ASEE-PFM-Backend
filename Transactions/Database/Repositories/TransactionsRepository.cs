@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Transactions.Commands;
 using Transactions.Database.Entities;
+using Transactions.Models.Categorization;
 using Transactions.Models.Transaction;
 using Transactions.Models.Transaction.Enums;
 using Transactions.Problems;
@@ -18,6 +19,18 @@ namespace Transactions.Database.Repositories{
         public TransactionsRepository(TransactionsDbContext dbContext, IMapper mapper){
             _dbContext=dbContext;
             _mapper = mapper;
+        }
+
+        public async Task<int> AutoCategorize(RulesList rulesList)
+        {
+            foreach (var rule in rulesList.Rules)
+            {
+                //_dbContext.Transactions.Update(_dbContext.Transactions.FromSqlInterpolated()).Entity.Catcode=;
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return 0;
         }
 
         public async Task<Problem> Categorize(string id, TransactionCategorizeCommand transactionCategorizeCommand)

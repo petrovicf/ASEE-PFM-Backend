@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Transactions.Json;
 using Transactions.Models.Category;
 using Transactions.Models.Transaction.Enums;
 
@@ -29,6 +30,7 @@ namespace Transactions.Models.Transaction{
 
         [JsonProperty("amount")]
         [Required]
+        [JsonConverter(typeof(DoubleJsonConverter))]
         public double Amount { get; set; }
         
         [JsonProperty("description")]

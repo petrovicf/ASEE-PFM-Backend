@@ -23,6 +23,10 @@ using Transactions.Models.Transaction.Enums;
 using Transactions.Problems;
 using Transactions.Services;
 using Transactions.Validation;
+using Newtonsoft.Json.Serialization;
+using Transactions.Json;
+using Transactions.Models.Categorization;
+using System.Text.Json;
 
 namespace Transactions.Controllers{
     [ApiController]
@@ -82,7 +86,7 @@ namespace Transactions.Controllers{
 
             var listToReturn = await _transactionsService.GetTransactions(transactionKinds, startDate, endDate, page.Value, pageSize.Value, sortBy, sortOrder);
 
-            return Ok(JsonConvert.SerializeObject(listToReturn,Formatting.Indented));
+            return Ok(JsonConvert.SerializeObject(listToReturn,Formatting.Indented, new JsonSerializerSettings{DateFormatString = "MM/dd/yyyy"}));
         }
 
         [HttpPost("transaction/{id}/categorize")]
@@ -122,6 +126,13 @@ namespace Transactions.Controllers{
             }
 
             return Ok("Transaction splitted");
+        }
+
+        [HttpPost("transaction/auto-categorize")]
+        public async Task<IActionResult> AutoCategorizeTransactions(){
+            await _transactionsService.AutoCategorizeTransactions();
+
+            return Ok();
         }
     }
 }
