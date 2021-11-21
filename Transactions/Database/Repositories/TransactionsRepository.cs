@@ -23,9 +23,12 @@ namespace Transactions.Database.Repositories{
 
         public async Task<int> AutoCategorize(RulesList rulesList)
         {
+            List<TransactionEntity> transactionsToUpdate;
             foreach (var rule in rulesList.Rules)
             {
-                //_dbContext.Transactions.Update(_dbContext.Transactions.FromSqlInterpolated()).Entity.Catcode=;
+                transactionsToUpdate = _dbContext.Transactions.FromSqlInterpolated($"SELECT * FROM transactions WHERE {rule.Predicate}").ToList();
+                transactionsToUpdate.ForEach(t=>t.Catcode=rule.Catcode);
+                _dbContext.UpdateRange(transactionsToUpdate);
             }
 
             await _dbContext.SaveChangesAsync();
@@ -87,7 +90,7 @@ namespace Transactions.Database.Repositories{
                 }
             }
 
-            query = query.Skip((page-1) * pageSize).Take(pageSize);
+            query = query.Skip((page-1<0 ? 0 : page-1) * pageSize).Take(pageSize);
             var pagedSortedTransactionsWithSplitsList = await query.ToListAsync();
 
             return new TransactionPagedList<TransactionEntity>{

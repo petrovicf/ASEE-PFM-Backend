@@ -132,7 +132,7 @@ namespace Transactions.Controllers{
         public async Task<IActionResult> AutoCategorizeTransactions(){
             await _transactionsService.AutoCategorizeTransactions();
 
-            return Ok();
+            return Ok("Transaction auto categorized");
         }
     }
 }
